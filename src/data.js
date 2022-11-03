@@ -5,6 +5,7 @@ export const useDataStore = defineStore('data', {
     return {
       wordList: [],
       progress: {
+        dataURL: '',
         progressList: [],
         cursor: 0,
         round: 0
@@ -13,57 +14,56 @@ export const useDataStore = defineStore('data', {
   },
   actions: {
     load() { // these datas are loaded from localstorage
-      this.listName = 'test'
-      this.wordList = [
-        {'en': 'abnegation', 'ch': '否认'},
-        {'en': 'accessible', 'ch': '容易理解的'},
-        {'en': 'accustomed', 'ch': '习惯的'},
-        {'en': 'admirable', 'ch': '令⼈敬佩的'},
-        {'en': 'anecdote', 'ch': '趣闻轶事'},
-        {'en': 'assuage', 'ch': '减轻，缓和'},
-        {'en': 'authoritative', 'ch': '有权威的'},
-        {'en': 'betoken', 'ch': '表示'},
-        {'en': 'bland', 'ch': '乏味的'},
-        {'en': 'calumny', 'ch': '诽谤'},
-        {'en': 'chic', 'ch': '时髦的'},
-        {'en': 'circumstantial', 'ch': '依情况⽽定的'},
-        {'en': 'civility', 'ch': '礼貌'},
-        {'en': 'coalesce', 'ch': '合并'},
-        {'en': 'collude', 'ch': '串通'},
-        {'en': 'compartmentalize', 'ch': '分开'},
-        {'en': 'comprise', 'ch': '包含'},
-        {'en': 'conducive', 'ch': '有助于...的'},
-        {'en': 'consensus', 'ch': '⼀致意⻅'},
-        {'en': 'consummate', 'ch': '完美的'},
-        {'en': 'DONE', 'ch': 'DONE'},
-        {'en': 'DONE', 'ch': 'DONE'},
-        {'en': 'DONE', 'ch': 'DONE'},
-        {'en': 'DONE', 'ch': 'DONE'},
-        {'en': 'DONE', 'ch': 'DONE'},
-        {'en': 'DONE', 'ch': 'DONE'},
-        {'en': 'DONE', 'ch': 'DONE'},
-        {'en': 'DONE', 'ch': 'DONE'},
-        {'en': 'DONE', 'ch': 'DONE'},
-        {'en': 'DONE', 'ch': 'DONE'},
-        {'en': 'DONE', 'ch': 'DONE'},
-        {'en': 'DONE', 'ch': 'DONE'},
-        {'en': 'DONE', 'ch': 'DONE'},
-        {'en': 'DONE', 'ch': 'DONE'},
-        {'en': 'DONE', 'ch': 'DONE'},
-        {'en': 'DONE', 'ch': 'DONE'},
-        {'en': 'DONE', 'ch': 'DONE'},
-        {'en': 'DONE', 'ch': 'DONE'},
-        {'en': 'DONE', 'ch': 'DONE'},
-        {'en': 'DONE', 'ch': 'DONE'},
-        {'en': 'DONE', 'ch': 'DONE'},
-      ]
-      this.progress.cursor = 0
-      this.progress.progressList = [
-      ]
+      if (!this.loadWordList()) {
+        this.wordList = []
+      }
+      if (!this.loadProgress()) {
+        this.progress = {
+          dataURL: '',
+          progressList: [],
+          cursor: 0,
+          round: 0
+        }
+      }
       this.fillProgressList()
     },
 
+    saveWordList() {
+      localStorage.setItem('progress', JSON.stringify(this.wordList))
+    },
+
+    loadWordList() {
+      try {
+        let localWordList = JSON.parse(localStorage.getItem('wordList'))
+        if (localWordList == null) return false
+        this.wordList = localWordList
+      } catch (e) {
+        return false
+      }
+      return true
+    },
+
+    saveProgress() {
+      localStorage.setItem('progress', JSON.stringify(this.progress))
+    },
+
+    loadProgress() {
+      try {
+        let localProgress = JSON.parse(localStorage.getItem('progress'))
+        if (localProgress == null) return false
+        this.progress = localProgress
+      } catch (e) {
+        return false
+      }
+      return true
+    },
+
+    saveProgress() {
+      localStorage.setItem('progress', JSON.stringify(this.progress))
+    },
+
     fillProgressList() {
+      if (this.wordList.length == 0) return
       while (this.progress.progressList.length < 12) {
         let word = this.wordList[this.progress.cursor]
         this.progress.cursor = (this.progress.cursor + 1) % this.wordList.length
@@ -72,10 +72,16 @@ export const useDataStore = defineStore('data', {
     },
 
     getWord() {
+      if (this.wordList.length == 0) {
+        return {'en': 'WORDLIST_EMPTY', 'ch': '请先设置词汇表'}
+      }
       return this.progress.progressList[0]
     },
 
     update(state) {
+      if (this.wordList.length == 0) {
+        return
+      }
       this.fillProgressList() // make sure length is 12 before operating
       let word = this.progress.progressList.shift()
 

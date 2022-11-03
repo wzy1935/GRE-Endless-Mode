@@ -5,16 +5,17 @@
         <div class=" flex justify-between p-4">
           <!-- header -->
           <div class=" text-sm">R1-W1</div>
-          <div class=" text-sm cursor-pointer text-emerald-500" @click="dialog = true">设置</div>
+          <div class=" text-sm cursor-pointer text-emerald-500" @click="settingClk">设置</div>
         </div>
         <hr />
         <div>
           <!-- center -->
-          <div class=" mt-64 flex flex-col justify-center items-center">
-            <div class=" text-2xl font-bold p-4" :class="showingState == SHOWN_TRUE ? ' text-emerald-500' : showingState == SHOWN_FALSE ? ' text-red-500' : ''">
-              word
+          <div class=" mt-48 flex flex-col justify-center items-center">
+            <div class=" text-2xl font-bold p-4"
+              :class="showingState == SHOWN_TRUE ? ' text-emerald-500' : showingState == SHOWN_FALSE ? ' text-red-500' : ''">
+              {{ currentWord.en }}
             </div>
-            <pre class=" font-sans" v-if="showingState != HIDDEN">des des</pre>
+            <pre class=" font-sans text-center" v-if="showingState != HIDDEN">{{ currentWord.ch }}</pre>
           </div>
 
         </div>
@@ -23,18 +24,21 @@
         <div class="h-48 p-8">
           <!-- buttons -->
           <div v-if="showingState == HIDDEN" class=" flex flex-col space-y-4">
-            <button class=" bg-emerald-500 hover:bg-emerald-400 text-white p-2 rounded-md">我认识</button>
-            <button class=" bg-red-500 hover:bg-red-400 text-white p-2 rounded-md">我不认识</button>
+            <button class=" bg-emerald-500 hover:bg-emerald-400 text-white p-2 rounded-md"
+              @click="showingState = SHOWN_TRUE">我认识</button>
+            <button class=" bg-red-500 hover:bg-red-400 text-white p-2 rounded-md"
+              @click="showingState = SHOWN_FALSE">我不认识</button>
           </div>
 
           <div v-if="showingState == SHOWN_TRUE" class=" flex flex-col space-y-4">
-            <button class=" bg-emerald-500 hover:bg-emerald-400 text-white p-2 rounded-md">下一个</button>
-            <button class=" bg-orange-500 hover:bg-orange-400 text-white p-2 rounded-md">我记错了</button>
+            <button class=" bg-emerald-500 hover:bg-emerald-400 text-white p-2 rounded-md" @click="nextClk">下一个</button>
+            <button class=" bg-orange-500 hover:bg-orange-400 text-white p-2 rounded-md"
+              @click="showingState = SHOWN_FALSE">我记错了</button>
           </div>
 
           <div v-if="showingState == SHOWN_FALSE" class=" flex flex-col space-y-4">
             <button class=" bg-emerald-500 hover:bg-emerald-400 text-white p-2 rounded-md invisible">--</button>
-            <button class=" bg-emerald-500 hover:bg-emerald-400 text-white p-2 rounded-md">下一个</button>
+            <button class=" bg-emerald-500 hover:bg-emerald-400 text-white p-2 rounded-md" @click="nextClk">下一个</button>
           </div>
 
         </div>
@@ -55,15 +59,17 @@
           <div>
             <div class=" my-2">词汇源</div>
             <div class=" flex w-full">
-              <input type="text" class=" mr-2 bg-slate-100 p-2 rounded-sm w-full focus:outline-slate-200"/>
-              <button class=" bg-emerald-500 hover:bg-emerald-400 rounded-sm text-white p-2 shrink-0">设置</button>
+              <input type="text" class=" mr-2 bg-slate-100 p-2 rounded-sm w-full focus:outline-slate-200"
+                v-model="wordURLText" />
+              <button class=" bg-emerald-500 hover:bg-emerald-400 rounded-sm text-white p-2 shrink-0">下载</button>
             </div>
           </div>
 
           <div>
             <div class=" my-2">词汇数据</div>
             <div class=" flex w-full">
-              <textarea type="text" class=" mr-2 h-32 bg-slate-100 rounded-sm p-2 w-full focus:outline-slate-200"/>
+              <textarea type="text" class=" mr-2 h-32 bg-slate-100 rounded-sm p-2 w-full focus:outline-slate-200"
+                v-model="wordDataText" />
               <button class=" bg-emerald-500 text-white hover:bg-emerald-400 rounded-sm p-2 shrink-0">更新</button>
             </div>
           </div>
@@ -71,7 +77,8 @@
           <div>
             <div class=" my-2">进度数据</div>
             <div class=" flex w-full">
-              <textarea type="text" class=" mr-2 h-32 bg-slate-100 rounded-sm p-2 w-full focus:outline-slate-200"/>
+              <textarea type="text" class=" mr-2 h-32 bg-slate-100 rounded-sm p-2 w-full focus:outline-slate-200"
+                v-model="progressDataText" />
               <button class=" bg-emerald-500 text-white hover:bg-emerald-400 rounded-sm p-2 shrink-0">更新</button>
             </div>
           </div>
@@ -99,6 +106,25 @@ let dialog = ref(false)
 data.load()
 let currentWord = ref(data.getWord())
 let showingState = ref(HIDDEN)
+
+function nextClk() {
+  data.update(showingState.value == SHOWN_TRUE ? true : false)
+  data.saveProgress()
+  showingState.value = HIDDEN
+  currentWord.value = data.getWord()
+}
+
+//config related
+let wordURLText = ref(data.progress.dataURL)
+let wordDataText = ref(JSON.stringify(data.wordList, null, 2))
+let progressDataText = ref(JSON.stringify(data.progress, null, 2))
+
+function settingClk() {
+  wordURLText = ref(data.progress.dataURL)
+  wordDataText = ref(JSON.stringify(data.wordList, null, 2))
+  progressDataText = ref(JSON.stringify(data.progress, null, 2))
+  dialog.value = true
+}
 
 </script>
 
