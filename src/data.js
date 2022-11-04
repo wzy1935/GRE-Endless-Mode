@@ -14,27 +14,22 @@ export const useDataStore = defineStore('data', {
   },
   actions: {
     load() { // these datas are loaded from localstorage
-      if (!this.loadWordList()) {
-        this.wordList = []
+      if (!this.loadWordList(localStorage.getItem('wordList'))) {
+        this.resetWordList()
       }
-      if (!this.loadProgress()) {
-        this.progress = {
-          dataURL: '',
-          progressList: [],
-          cursor: 0,
-          round: 0
-        }
+      if (!this.loadProgress(localStorage.getItem('progress'))) {
+        this.resetProgress()
       }
       this.fillProgressList()
     },
 
     saveWordList() {
-      localStorage.setItem('progress', JSON.stringify(this.wordList))
+      localStorage.setItem('wordList', JSON.stringify(this.wordList))
     },
 
-    loadWordList() {
+    loadWordList(strs) {
       try {
-        let localWordList = JSON.parse(localStorage.getItem('wordList'))
+        let localWordList = JSON.parse(strs)
         if (localWordList == null) return false
         this.wordList = localWordList
       } catch (e) {
@@ -43,13 +38,18 @@ export const useDataStore = defineStore('data', {
       return true
     },
 
+    resetWordList() {
+      this.wordList = []
+      this.saveWordList()
+    },
+
     saveProgress() {
       localStorage.setItem('progress', JSON.stringify(this.progress))
     },
 
-    loadProgress() {
+    loadProgress(strs) {
       try {
-        let localProgress = JSON.parse(localStorage.getItem('progress'))
+        let localProgress = JSON.parse(strs)
         if (localProgress == null) return false
         this.progress = localProgress
       } catch (e) {
@@ -58,14 +58,21 @@ export const useDataStore = defineStore('data', {
       return true
     },
 
-    saveProgress() {
-      localStorage.setItem('progress', JSON.stringify(this.progress))
+    resetProgress() {
+      this.progress = {
+        dataURL: 'https://raw.githubusercontent.com/wzy1935/GRE-Endless-Mode/master/wordlist/test.json',
+        progressList: [],
+        cursor: 0,
+        round: 0
+      }
+      this.saveProgress()
     },
 
     fillProgressList() {
       if (this.wordList.length == 0) return
       while (this.progress.progressList.length < 12) {
         let word = this.wordList[this.progress.cursor]
+        if (this.progress.cursor + 1 >= this.wordList.length) this.progress.round++
         this.progress.cursor = (this.progress.cursor + 1) % this.wordList.length
         this.progress.progressList.push({'en': word.en, 'ch': word.ch, 'age': 2})
       }
