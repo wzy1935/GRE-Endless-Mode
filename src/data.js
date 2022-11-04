@@ -60,7 +60,7 @@ export const useDataStore = defineStore('data', {
 
     resetProgress() {
       this.progress = {
-        dataURL: 'https://raw.githubusercontent.com/wzy1935/GRE-Endless-Mode/master/wordlist/test.json',
+        dataURL: 'https://raw.githubusercontent.com/wzy1935/GRE-Endless-Mode/master/wordlist/fj_shuffled.json',
         progressList: [],
         cursor: 0,
         round: 0

@@ -31,9 +31,9 @@
           </div>
 
           <div v-if="showingState == SHOWN_TRUE" class=" flex flex-col space-y-4">
-            <button class=" bg-emerald-500 hover:bg-emerald-400 text-white p-2 rounded-md" @click="nextClk">下一个</button>
             <button class=" bg-orange-500 hover:bg-orange-400 text-white p-2 rounded-md"
               @click="showingState = SHOWN_FALSE">我记错了</button>
+            <button class=" bg-emerald-500 hover:bg-emerald-400 text-white p-2 rounded-md" @click="nextClk">下一个</button>
           </div>
 
           <div v-if="showingState == SHOWN_FALSE" class=" flex flex-col space-y-4">
