@@ -18,6 +18,7 @@
             <pre class=" font-sans text-center" v-if="showingState != HIDDEN">{{ currentWord.ch }}</pre>
           </div>
 
+          
         </div>
       </div>
       <div>
